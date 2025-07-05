@@ -63,14 +63,16 @@ jobs:
       - name: pkgbuild macOS package
         run: |
           echo "Creating macOS package..."
-          pkgbuild --root . --identifier "com.laoshanxi.appmesh" --version "${APPMESH_VERSION}" --install-location /opt/appmesh appmesh.${APPMESH_VERSION}.pkg
-          ls
+          pkgbuild --root . --identifier "com.laoshanxi.appmesh" --version "${APPMESH_VERSION}" --install-location /opt/appmesh appmesh_${APPMESH_VERSION}.pkg
+          ls -al
 
       - name: Upload packages
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.os }}-${{ github.sha }}
-          path: build/appmesh_*.gz
+          path: 
+            build/appmesh_*.gz
+            build/appmesh_*.pkg
 
   test:
     needs: build
@@ -88,8 +90,9 @@ jobs:
         run: |
           echo "Testing the project..."
           # Install App Mesh
-          sudo mkdir -p /opt/appmesh
-          sudo tar zxvf appmesh_*_arm64.gz -C /opt/appmesh
+          sudo installer -pkg appmesh_${APPMESH_VERSION}.pkg -target /
+          #sudo mkdir -p /opt/appmesh
+          #sudo tar zxvf appmesh_*_arm64.gz -C /opt/appmesh
           sudo bash /opt/appmesh/script/setup.sh
 
           # Start App Mesh
