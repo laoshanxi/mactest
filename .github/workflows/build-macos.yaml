@@ -14,7 +14,7 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [macos-14, macos-15]
+        os: [macos-14]
     runs-on: ${{ matrix.os }}
     permissions:
       contents: read
@@ -39,7 +39,9 @@ jobs:
       - name: clone code
         run: |
           echo "Cloning repository..."
-          git clone --depth 1 --branch main https://github.com/laoshanxi/app-mesh.git .
+          git clone --depth 1 --branch main https://github.com/laoshanxi/app-mesh.git appmesh
+          mv appmesh/* ./
+          rm -rf appmesh
 
       - name: Configure Build Environment
         run: |
