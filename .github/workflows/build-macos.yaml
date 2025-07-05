@@ -1,0 +1,102 @@
+name: "Release macOS Package"
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/build-macos.yaml"
+
+env:
+  APPMESH_VERSION: "2.1.2"
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [macos-14, macos-15]
+    runs-on: ${{ matrix.os }}
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+
+    steps:
+      - name: Checkout Github code
+        uses: actions/checkout@v4
+
+      - name: Setup Homebrew and Install Dependencies
+        run: |
+          echo "Updating Homebrew..."
+          brew update
+
+          echo "Installing required packages..."
+          brew install git wget cmake go openssl@3 boost log4cpp openldap cryptopp oath-toolkit yaml-cpp nlohmann-json msgpack-cxx
+
+          echo "Verifying installed packages..."
+          brew list
+
+      - name: clone code
+        run: |
+          echo "Cloning repository..."
+          git clone --depth 1 --branch main https://github.com/laoshanxi/app-mesh.git .
+
+      - name: Configure Build Environment
+        run: |
+          bash script/setup_build_env/autogen.sh.mac.sh
+
+      - name: Build project
+        if: always()
+        run: |
+          echo "Creating build directory..."
+          mkdir -p build && cd build
+
+          echo "Running CMake configuration..."
+          cmake ..
+
+          echo "Building the project..."
+          make -j"$(sysctl -n hw.ncpu)"
+          make pack
+
+      - name: Upload packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.os }}-${{ github.sha }}
+          path: build/appmesh_*.gz
+
+  test:
+    needs: build
+    strategy:
+      matrix:
+        os: [macos-14, macos-15]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Download packages
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ matrix.os }}-${{ github.sha }}
+
+      - name: Run tests
+        run: |
+          echo "Testing the project..."
+          # Install App Mesh
+          sudo mkdir -p /opt/appmesh
+          sudo tar zxvf appmesh_*_arm64.gz -C /opt/appmesh
+          sudo bash /opt/appmesh/script/setup.sh
+
+          # Start App Mesh
+          appc -v || true
+          sudo bash /opt/appmesh/script/appmesh.initd.sh start || true
+
+          # Check
+          sudo otool /opt/appmesh/bin/appsvc -L
+
+          # hostname resolve need some time
+          sleep 10
+
+          # Test
+          tail /opt/appmesh/work/server.log
+          tail /opt/appmesh/work/stdout/appmesh.agent.out
+          # sudo lldb -p $(cat /opt/appmesh/appmesh.pid) -o "thread backtrace all" -o "quit" || true
+          appc ls
+          appc resource
