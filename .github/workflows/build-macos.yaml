@@ -71,9 +71,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.os }}-${{ github.sha }}
-          path: 
-            build/appmesh_*.gz
-            build/appmesh_*.pkg
+          path: build/appmesh_*.pkg
 
   test:
     needs: build
