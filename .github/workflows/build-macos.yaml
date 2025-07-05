@@ -60,6 +60,12 @@ jobs:
           make -j"$(sysctl -n hw.ncpu)"
           make pack
 
+      - name: pkgbuild macOS package
+        run: |
+          echo "Creating macOS package..."
+          pkgbuild --root . --identifier "com.laoshanxi.appmesh" --version "${APPMESH_VERSION}" --install-location /opt/appmesh appmesh.${APPMESH_VERSION}.pkg
+          ls
+
       - name: Upload packages
         uses: actions/upload-artifact@v4
         with:
