@@ -64,7 +64,7 @@ jobs:
         run: |
           echo "Creating macOS package..."
           cd build
-          pkgbuild --root . --identifier "com.laoshanxi.appmesh" --version "${APPMESH_VERSION}" --install-location /opt/appmesh appmesh_${APPMESH_VERSION}.pkg
+          pkgbuild --root ./nfpm_home --identifier "com.laoshanxi.appmesh" --version "${APPMESH_VERSION}" --install-location /opt/appmesh appmesh_${APPMESH_VERSION}.pkg
           ls -al
 
       - name: Upload packages
