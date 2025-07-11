@@ -208,7 +208,7 @@ Write-Host "=== Building QR Code Generator ===" -ForegroundColor Cyan
 git clone --depth=1 https://github.com/nayuki/QR-Code-generator.git
 Set-Location "QR-Code-generator\cpp"
 # Build using MSVC
-cmd /c "\"C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\Common7\Tools\VsDevCmd.bat\" && cl /EHsc /c qrcodegen.cpp && lib qrcodegen.obj /OUT:qrcodegencpp.lib"
+& "C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\Common7\Tools\VsDevCmd.bat" && cl /EHsc /c qrcodegen.cpp && lib qrcodegen.obj /OUT:qrcodegencpp.lib
 Copy-Item "qrcodegen.hpp" "C:\local\include\"
 Copy-Item "qrcodegen.cpp" "C:\local\include\"
 Copy-Item "qrcodegencpp.lib" "C:\local\lib\"
