@@ -78,22 +78,22 @@ if (!(Test-Path "C:\vcpkg")) {
 $env:VCPKG_ROOT = "C:\vcpkg"
 
 Write-Host "=== Installing OpenSSL ===" -ForegroundColor Cyan
-C:\vcpkg\vcpkg.exe install openssl:x64-windows --quiet
+C:\vcpkg\vcpkg.exe install openssl:x64-windows
 
 Write-Host "=== Installing Boost Libraries ===" -ForegroundColor Cyan
-C:\vcpkg\vcpkg.exe install boost:x64-windows --quiet
+C:\vcpkg\vcpkg.exe install boost:x64-windows
 
 Write-Host "=== Installing Crypto++ ===" -ForegroundColor Cyan
-C:\vcpkg\vcpkg.exe install cryptopp:x64-windows --quiet
+C:\vcpkg\vcpkg.exe install cryptopp:x64-windows
 
 Write-Host "=== Installing cURL ===" -ForegroundColor Cyan
-C:\vcpkg\vcpkg.exe install curl:x64-windows --quiet
+C:\vcpkg\vcpkg.exe install curl:x64-windows
 
 Write-Host "=== Installing yaml-cpp ===" -ForegroundColor Cyan
-C:\vcpkg\vcpkg.exe install yaml-cpp:x64-windows --quiet
+C:\vcpkg\vcpkg.exe install yaml-cpp:x64-windows
 
 Write-Host "=== Installing OpenLDAP ===" -ForegroundColor Cyan
-C:\vcpkg\vcpkg.exe install openldap:x64-windows --quiet
+C:\vcpkg\vcpkg.exe install openldap:x64-windows
 
 Write-Host "=== Installing ACE Framework ===" -ForegroundColor Cyan
 # ACE needs to be built from source on Windows
