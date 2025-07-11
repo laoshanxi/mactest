@@ -78,19 +78,22 @@ if (!(Test-Path "C:\vcpkg")) {
 $env:VCPKG_ROOT = "C:\vcpkg"
 
 Write-Host "=== Installing OpenSSL ===" -ForegroundColor Cyan
-C:\vcpkg\vcpkg.exe install openssl:x64-windows
+C:\vcpkg\vcpkg.exe install openssl:x64-windows --quiet
 
 Write-Host "=== Installing Boost Libraries ===" -ForegroundColor Cyan
-C:\vcpkg\vcpkg.exe install boost:x64-windows
+C:\vcpkg\vcpkg.exe install boost:x64-windows --quiet
 
 Write-Host "=== Installing Crypto++ ===" -ForegroundColor Cyan
-C:\vcpkg\vcpkg.exe install cryptopp:x64-windows
+C:\vcpkg\vcpkg.exe install cryptopp:x64-windows --quiet
 
 Write-Host "=== Installing cURL ===" -ForegroundColor Cyan
-C:\vcpkg\vcpkg.exe install curl:x64-windows
+C:\vcpkg\vcpkg.exe install curl:x64-windows --quiet
 
 Write-Host "=== Installing yaml-cpp ===" -ForegroundColor Cyan
-C:\vcpkg\vcpkg.exe install yaml-cpp:x64-windows
+C:\vcpkg\vcpkg.exe install yaml-cpp:x64-windows --quiet
+
+Write-Host "=== Installing OpenLDAP ===" -ForegroundColor Cyan
+C:\vcpkg\vcpkg.exe install openldap:x64-windows --quiet
 
 Write-Host "=== Installing ACE Framework ===" -ForegroundColor Cyan
 # ACE needs to be built from source on Windows
@@ -192,7 +195,6 @@ git clone --depth=1 -b v2.x https://github.com/catchorg/Catch2.git
 Copy-Item "Catch2\single_include\catch2\catch.hpp" "C:\local\include\"
 
 Write-Host "=== Building LDAP-CPP ===" -ForegroundColor Cyan
-C:\vcpkg\vcpkg.exe install openldap:x64-windows
 
 git clone --depth=1 https://github.com/AndreyBarmaley/ldap-cpp.git
 Set-Location ldap-cpp
