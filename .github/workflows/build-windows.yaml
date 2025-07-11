@@ -12,7 +12,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Run setup_build_env.ps1
+      - name: Set PowerShell Execution Policy
         shell: pwsh
         run: |
-          ./setup_build_env.ps1
+          Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+
+      - name: Run setup_build_env.ps1 as Administrator
+        shell: pwsh
+        run: |
+          Start-Process pwsh -ArgumentList '-File ./setup_build_env.ps1' -Verb RunAs -Wait

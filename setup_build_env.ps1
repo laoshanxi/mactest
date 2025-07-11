@@ -37,11 +37,11 @@ function Download-File {
 # Function to extract archives
 function Extract-Archive {
     param($archive, $destination)
-    Write-Host "Extracting $archive to $destination..." -ForegroundColor Yellow
+    Write-Host "Extracting $archive..." -ForegroundColor Yellow
     Expand-Archive -Path $archive -DestinationPath $destination -Force
 }
 
-Write-Host "=== Installing Chocolatey Package Manager ===" -ForegroundColor Cyan
+Write-Host "Installing Chocolatey..." -ForegroundColor Cyan
 if (!(Get-Command choco -ErrorAction SilentlyContinue)) {
     Set-ExecutionPolicy Bypass -Scope Process -Force
     [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
@@ -49,11 +49,11 @@ if (!(Get-Command choco -ErrorAction SilentlyContinue)) {
     refreshenv
 }
 
-Write-Host "=== Installing Visual Studio Build Tools ===" -ForegroundColor Cyan
+Write-Host "Installing Visual Studio Build Tools..." -ForegroundColor Cyan
 # Install Visual Studio 2022 Build Tools with C++ workload
 choco install -y visualstudio2022buildtools --package-parameters "--add Microsoft.VisualStudio.Workload.VCTools --add Microsoft.VisualStudio.Component.VC.Tools.x86.x64 --add Microsoft.VisualStudio.Component.Windows11SDK.22621"
 
-Write-Host "=== Installing CMake and Build Tools ===" -ForegroundColor Cyan
+Write-Host "Installing CMake, Git, Wget, 7zip..." -ForegroundColor Cyan
 choco install -y cmake
 choco install -y git
 choco install -y wget
@@ -113,7 +113,7 @@ $env:PATH = "$env:ACE_ROOT\bin;$env:PATH"
 # Build ACE using MSVC
 Set-Location "$env:ACE_ROOT"
 & "C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\Common7\Tools\VsDevCmd.bat"
-msbuild ACE_vs2019.sln /p:Configuration=Release /p:Platform=x64
+& "C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin\MSBuild.exe" ACE_vs2019.sln /p:Configuration=Release /p:Platform=x64
 
 Set-Location $ROOTDIR
 
