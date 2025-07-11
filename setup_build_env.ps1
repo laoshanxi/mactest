@@ -116,7 +116,7 @@ $env:PATH = "$env:ACE_ROOT\bin;$env:PATH"
 # Build ACE using MSVC
 Set-Location "$env:ACE_ROOT"
 & "C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\Common7\Tools\VsDevCmd.bat"
-& "C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin\MSBuild.exe" ACE_vs2019.sln /p:Configuration=Release /p:Platform=x64
+& "C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin\MSBuild.exe" ACE_vs2019.sln /p:Configuration=Release /p:Platform=x64 /m
 
 Set-Location $ROOTDIR
 
@@ -156,7 +156,7 @@ Write-Host "=== Installing MessagePack C++ ===" -ForegroundColor Cyan
 git clone -b cpp_master --depth 1 https://github.com/msgpack/msgpack-c.git
 Set-Location msgpack-c
 cmake . -DCMAKE_INSTALL_PREFIX=C:\local -DCMAKE_TOOLCHAIN_FILE=C:\vcpkg\scripts\buildsystems\vcpkg.cmake
-cmake --build . --config Release --target install
+cmake --build . --config Release --target install --parallel
 Set-Location $ROOTDIR
 
 Write-Host "=== Installing Header-only Libraries ===" -ForegroundColor Cyan
@@ -201,8 +201,8 @@ Set-Location ldap-cpp
 New-Item -ItemType Directory -Force -Path "build"
 Set-Location build
 cmake -DBUILD_SHARED_LIBS=OFF -DCMAKE_INSTALL_PREFIX=C:\local -DCMAKE_TOOLCHAIN_FILE=C:\vcpkg\scripts\buildsystems\vcpkg.cmake ..
-    cmake --build . --config Release --target install
-    Set-Location $ROOTDIR
+cmake --build . --config Release --target install --parallel
+Set-Location $ROOTDIR
 
 Write-Host "=== Building QR Code Generator ===" -ForegroundColor Cyan
 git clone --depth=1 https://github.com/nayuki/QR-Code-generator.git
