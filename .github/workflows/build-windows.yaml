@@ -20,4 +20,4 @@ jobs:
       - name: Run setup_build_env.ps1 as Administrator
         shell: pwsh
         run: |
-          Start-Process pwsh -ArgumentList '-File ./setup_build_env.ps1' -Verb RunAs -Wait
+          pwsh -File ./setup_build_env.ps1
