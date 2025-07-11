@@ -214,12 +214,6 @@ Copy-Item "qrcodegen.cpp" "C:\local\include\"
 Copy-Item "qrcodegencpp.lib" "C:\local\lib\"
 Set-Location $ROOTDIR
 
-Write-Host "=== Installing Syft for SBOM ===" -ForegroundColor Cyan
-$syftUrl = "https://github.com/anchore/syft/releases/latest/download/syft_windows_amd64.zip"
-Download-File $syftUrl "syft.zip"
-Extract-Archive "syft.zip" "syft-temp"
-Copy-Item "syft-temp\syft.exe" "C:\local\bin\"
-
 Write-Host "=== Setting Environment Variables ===" -ForegroundColor Cyan
 # Set permanent environment variables
 $paths = @(
