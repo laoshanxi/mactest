@@ -192,13 +192,15 @@ git clone --depth=1 -b v2.x https://github.com/catchorg/Catch2.git
 Copy-Item "Catch2\single_include\catch2\catch.hpp" "C:\local\include\"
 
 Write-Host "=== Building LDAP-CPP ===" -ForegroundColor Cyan
+C:\vcpkg\vcpkg.exe install openldap:x64-windows
+
 git clone --depth=1 https://github.com/AndreyBarmaley/ldap-cpp.git
 Set-Location ldap-cpp
 New-Item -ItemType Directory -Force -Path "build"
 Set-Location build
 cmake -DBUILD_SHARED_LIBS=OFF -DCMAKE_INSTALL_PREFIX=C:\local -DCMAKE_TOOLCHAIN_FILE=C:\vcpkg\scripts\buildsystems\vcpkg.cmake ..
-cmake --build . --config Release --target install
-Set-Location $ROOTDIR
+    cmake --build . --config Release --target install
+    Set-Location $ROOTDIR
 
 Write-Host "=== Building QR Code Generator ===" -ForegroundColor Cyan
 git clone --depth=1 https://github.com/nayuki/QR-Code-generator.git
