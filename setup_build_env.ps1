@@ -41,6 +41,26 @@ function Extract-Archive {
     Expand-Archive -Path $archive -DestinationPath $destination -Force
 }
 
+# Function to find perl path
+function Find-Perl {
+    # Find by priority
+    $possiblePaths = @(
+        "C:\vcpkg\downloads\tools\perl\*\perl\bin", # from vcpkg
+        "C:\Perl*\bin",                             # stardand installation
+        "C:\Strawberry\perl\bin"                    # Strawberry Perl
+    )
+    
+    foreach ($path in $possiblePaths) {
+        $perlPath = Get-ChildItem -Path $path -Filter "perl.exe" -Recurse -ErrorAction SilentlyContinue | 
+                   Select-Object -First 1 -ExpandProperty Directory
+        if ($perlPath) {
+            Write-Host "Found Perl in: $perlPath" -ForegroundColor Green
+            return $perlPath
+        }
+    }
+    return $null
+}
+
 Write-Host "Installing Chocolatey..." -ForegroundColor Cyan
 if (!(Get-Command choco -ErrorAction SilentlyContinue)) {
     Set-ExecutionPolicy Bypass -Scope Process -Force
@@ -99,6 +119,20 @@ Download-File $aceUrl ACE-7.1.2.tar.gz
 tar zxvf ACE-7.1.2.tar.gz
 $acePath = Get-ChildItem -Directory -Name "*ACE_wrappers*" | Select-Object -First 1
 Set-Location $acePath
+
+# Add perl dir to PATH
+$perlPath = Find-Perl
+if ($perlPath) {
+    $env:PATH = "$perlPath;$env:PATH"
+} else {
+    Write-Host "No Perl installation found. Installing Perl..." -ForegroundColor Yellow
+    choco install -y strawberryperl
+    $perlPath = Find-Perl
+    if (!$perlPath) {
+        Write-Error "Failed to install and locate Perl"
+        exit 1
+    }
+}
 
 # Build ACE
 $env:ACE_ROOT = "$PWD"
