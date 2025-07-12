@@ -109,8 +109,18 @@ $env:PATH = "$env:ACE_ROOT\bin;$env:PATH"
 
 # Create ACE config files
 @"
+#define ACE_HAS_STANDARD_CPP_LIBRARY 1
+#define ACE_HAS_STDCPP_STL_INCLUDES 1
+#define ACE_LACKS_PRAGMA_ONCE 1
+#define ACE_HAS_SSL 1
 #include "ace/config-win32.h"
 "@ | Out-File -FilePath "$env:ACE_ROOT\ace\config.h" -Encoding ascii
+
+# Creating default.features and re-run MPC to add support for building the ACE_SSL library
+Write-Host "Creating default.features to enable SSL..." -ForegroundColor Yellow
+Add-Content "$env:ACE_ROOT\bin\MakeProjectCreator\config\default.features" "ssl=1"
+Add-Content "$env:ACE_ROOT\bin\MakeProjectCreator\config\default.features" "openssl11=1"
+perl .\bin\mwc.pl -type vs2019 ACE.mwc
 
 # Patch ACE project files to use VS2022 toolset
 Write-Host "Patching ACE project files to use VS2022 toolset..." -ForegroundColor Yellow
@@ -119,9 +129,16 @@ Get-ChildItem -Path "$env:ACE_ROOT" -Recurse -Filter *.vcxproj | ForEach-Object 
 }
 
 # Build ACE using MSVC
-Set-Location "$env:ACE_ROOT\ace"
+Set-Location "$env:ACE_ROOT"
 & "C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\Common7\Tools\VsDevCmd.bat"
-& "C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin\MSBuild.exe" ace_vs2019.sln /p:Configuration=Release /p:Platform=x64 /m
+& "C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin\MSBuild.exe" ACE.sln /t:ACE /p:Configuration=Release /p:Platform=x64 /maxcpucount
+& "C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin\MSBuild.exe" ACE.sln /t:SSL /p:Configuration=Release /p:Platform=x64 /maxcpucount
+
+# Install ACE libraries
+New-Item -ItemType Directory -Force -Path "C:\local\include\"
+Copy-Item -Recurse "$env:ACE_ROOT\ace" "C:\local\include\"
+New-Item -ItemType Directory -Force -Path "C:\local\lib\"
+Copy-Item "$env:ACE_ROOT\lib\*" "C:\local\lib\"
 
 Set-Location $ROOTDIR
 
