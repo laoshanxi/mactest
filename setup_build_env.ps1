@@ -112,6 +112,12 @@ $env:PATH = "$env:ACE_ROOT\bin;$env:PATH"
 #include "ace/config-win32.h"
 "@ | Out-File -FilePath "$env:ACE_ROOT\ace\config.h" -Encoding ascii
 
+# Patch ACE project files to use VS2022 toolset
+Write-Host "Patching ACE project files to use VS2022 toolset..." -ForegroundColor Yellow
+Get-ChildItem -Path "$env:ACE_ROOT" -Recurse -Filter *.vcxproj | ForEach-Object {
+    (Get-Content $_.FullName) -replace '<PlatformToolset>v142</PlatformToolset>', '<PlatformToolset>v143</PlatformToolset>' | Set-Content $_.FullName
+}
+
 # Build ACE using MSVC
 Set-Location "$env:ACE_ROOT\ace"
 & "C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\Common7\Tools\VsDevCmd.bat"
