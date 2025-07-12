@@ -112,6 +112,9 @@ C:\vcpkg\vcpkg.exe install curl:x64-windows
 Write-Host "=== Installing yaml-cpp ===" -ForegroundColor Cyan
 C:\vcpkg\vcpkg.exe install yaml-cpp:x64-windows
 
+Write-Host "=== Installing msgpack-c ===" -ForegroundColor Cyan
+C:\vcpkg\vcpkg.exe install msgpack-c:x64-windows
+
 Write-Host "=== Installing ACE Framework ===" -ForegroundColor Cyan
 # ACE needs to be built from source on Windows
 $aceUrl = "https://github.com/DOCGroup/ACE_TAO/releases/download/ACE%2BTAO-7_1_2/ACE-7.1.2.tar.gz"
@@ -206,13 +209,6 @@ choco install -y python3
 python -m pip install --upgrade pip
 python -m pip install msgpack requests requests_toolbelt aniso8601 twine wheel
 
-Write-Host "=== Installing MessagePack C++ ===" -ForegroundColor Cyan
-git clone -b cpp_master --depth 1 https://github.com/msgpack/msgpack-c.git
-Set-Location msgpack-c
-cmake . -DCMAKE_INSTALL_PREFIX=C:\local -DCMAKE_TOOLCHAIN_FILE=C:\vcpkg\scripts\buildsystems\vcpkg.cmake
-cmake --build . --config Release --target install --parallel
-Set-Location $ROOTDIR
-
 Write-Host "=== Installing Header-only Libraries ===" -ForegroundColor Cyan
 
 # hashidsxx
@@ -284,8 +280,8 @@ Write-Host "=== Creating CMake Toolchain File ===" -ForegroundColor Cyan
 set(CMAKE_SYSTEM_NAME Windows)
 set(CMAKE_SYSTEM_PROCESSOR x64)
 
-# Vcpkg integration
-set(CMAKE_TOOLCHAIN_FILE C:/vcpkg/scripts/buildsystems/vcpkg.cmake)
+# Explicitly include vcpkg toolchain
+include("C:/vcpkg/scripts/buildsystems/vcpkg.cmake")
 
 # Set additional include and library paths
 list(APPEND CMAKE_PREFIX_PATH C:/local)
