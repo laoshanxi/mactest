@@ -178,7 +178,7 @@ $jsonUrl = "https://github.com/nlohmann/json/releases/download/v3.11.3/include.z
 Download-File $jsonUrl "json-include.zip"
 Extract-Archive "json-include.zip" "json-temp"
 New-Item -ItemType Directory -Force -Path "C:\local\include"
-Copy-Item -Recurse "json-temp\include\nlohmann" "C:\local\include\"
+Copy-Item -Recurse "json-temp\include\nlohmann" "C:\local\include\" -Force
 
 Write-Host "=== Installing Go ===" -ForegroundColor Cyan
 if (!(Get-Command go -ErrorAction SilentlyContinue)) {
@@ -217,21 +217,21 @@ Write-Host "=== Installing Header-only Libraries ===" -ForegroundColor Cyan
 
 # hashidsxx
 git clone --depth=1 https://github.com/schoentoon/hashidsxx.git
-Copy-Item -Recurse "hashidsxx" "C:\local\include\"
+Copy-Item -Recurse "hashidsxx" "C:\local\include\" -Force
 
 # croncpp
 git clone --depth=1 https://github.com/mariusbancila/croncpp.git
-Copy-Item "croncpp\include\croncpp.h" "C:\local\include\"
+Copy-Item "croncpp\include\croncpp.h" "C:\local\include\" -Force
 
 # wildcards
 git clone --depth=1 https://github.com/laoshanxi/wildcards.git
-Copy-Item -Recurse "wildcards\single_include" "C:\local\include\wildcards"
+Copy-Item -Recurse "wildcards\single_include" "C:\local\include\wildcards" -Force
 
 # prometheus-cpp (header-only parts)
 git clone --depth=1 https://github.com/jupp0r/prometheus-cpp.git
 New-Item -ItemType Directory -Force -Path "C:\local\src\prometheus"
-Copy-Item -Recurse "prometheus-cpp\core\src\*" "C:\local\src\prometheus\"
-Copy-Item -Recurse "prometheus-cpp\core\include\prometheus" "C:\local\include\"
+Copy-Item -Recurse "prometheus-cpp\core\src\*" "C:\local\src\prometheus\" -Force
+Copy-Item -Recurse "prometheus-cpp\core\include\prometheus" "C:\local\include\" -Force
 
 # Create prometheus export header
 @"
@@ -242,11 +242,11 @@ Copy-Item -Recurse "prometheus-cpp\core\include\prometheus" "C:\local\include\"
 
 # jwt-cpp
 git clone --depth=1 https://github.com/Thalhammer/jwt-cpp.git
-Copy-Item -Recurse "jwt-cpp\include\jwt-cpp" "C:\local\include\"
+Copy-Item -Recurse "jwt-cpp\include\jwt-cpp" "C:\local\include\" -Force
 
 # Catch2
 git clone --depth=1 -b v2.x https://github.com/catchorg/Catch2.git
-Copy-Item "Catch2\single_include\catch2\catch.hpp" "C:\local\include\"
+Copy-Item "Catch2\single_include\catch2\catch.hpp" "C:\local\include\" -Force
 
 Write-Host "=== Building LDAP-CPP ===" -ForegroundColor Cyan
 
@@ -255,9 +255,9 @@ git clone --depth=1 https://github.com/nayuki/QR-Code-generator.git
 Set-Location "QR-Code-generator\cpp"
 # Build using MSVC
 cmd /c "`"C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\Common7\Tools\VsDevCmd.bat`" && cl /EHsc /c qrcodegen.cpp && lib qrcodegen.obj /OUT:qrcodegencpp.lib"
-Copy-Item "qrcodegen.hpp" "C:\local\include\"
-Copy-Item "qrcodegen.cpp" "C:\local\include\"
-Copy-Item "qrcodegencpp.lib" "C:\local\lib\"
+Copy-Item "qrcodegen.hpp" "C:\local\include\" -Force
+Copy-Item "qrcodegen.cpp" "C:\local\include\" -Force
+Copy-Item "qrcodegencpp.lib" "C:\local\lib\" -Force
 Set-Location $ROOTDIR
 
 Write-Host "=== Setting Environment Variables ===" -ForegroundColor Cyan
