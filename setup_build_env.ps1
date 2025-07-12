@@ -97,15 +97,14 @@ C:\vcpkg\vcpkg.exe install openldap:x64-windows
 
 Write-Host "=== Installing ACE Framework ===" -ForegroundColor Cyan
 # ACE needs to be built from source on Windows
-$aceVersion = "7.1.3"
-$aceUrl = "https://github.com/DOCGroup/ACE_TAO/archive/refs/tags/ACE+TAO-7_1_3.zip"
-Download-File $aceUrl "ace.zip"
-Extract-Archive "ace.zip" "."
-$acePath = Get-ChildItem -Directory -Name "*ACE_TAO*" | Select-Object -First 1
+$aceUrl = "https://github.com/DOCGroup/ACE_TAO/releases/download/ACE%2BTAO-7_1_2/ACE-7.1.2.tar.gz"
+Download-File $aceUrl ACE-7.1.2.tar.gz
+tar zxvf ACE-7.1.2.tar.gz
+$acePath = Get-ChildItem -Directory -Name "*ACE_wrappers*" | Select-Object -First 1
 Set-Location $acePath
 
 # Build ACE
-$env:ACE_ROOT = "$PWD\ACE"
+$env:ACE_ROOT = "$PWD"
 $env:PATH = "$env:ACE_ROOT\bin;$env:PATH"
 
 # Create ACE config files
@@ -114,9 +113,9 @@ $env:PATH = "$env:ACE_ROOT\bin;$env:PATH"
 "@ | Out-File -FilePath "$env:ACE_ROOT\ace\config.h" -Encoding ascii
 
 # Build ACE using MSVC
-Set-Location "$env:ACE_ROOT"
+Set-Location "$env:ACE_ROOT\ace"
 & "C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\Common7\Tools\VsDevCmd.bat"
-& "C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin\MSBuild.exe" ACE_vs2019.sln /p:Configuration=Release /p:Platform=x64 /m
+& "C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin\MSBuild.exe" ace_vs2019.sln /p:Configuration=Release /p:Platform=x64 /m
 
 Set-Location $ROOTDIR
 
