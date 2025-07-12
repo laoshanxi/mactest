@@ -136,9 +136,9 @@ Set-Location "$env:ACE_ROOT"
 
 # Install ACE libraries
 New-Item -ItemType Directory -Force -Path "C:\local\include\"
-Copy-Item -Recurse "$env:ACE_ROOT\ace" "C:\local\include\"
+Copy-Item -Recurse "$env:ACE_ROOT\ace" "C:\local\include\" -Force
 New-Item -ItemType Directory -Force -Path "C:\local\lib\"
-Copy-Item "$env:ACE_ROOT\lib\*" "C:\local\lib\"
+Copy-Item "$env:ACE_ROOT\lib\*" "C:\local\lib\" -Force
 
 Set-Location $ROOTDIR
 
