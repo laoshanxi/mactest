@@ -140,6 +140,7 @@ if (!(Get-Command go -ErrorAction SilentlyContinue)) {
 
 Write-Host "=== Installing Go Dependencies ===" -ForegroundColor Cyan
 $env:GO111MODULE = "on"
+$env:GOPROXY = "https://goproxy.io,direct"
 $env:GOBIN = "C:\local\bin"
 New-Item -ItemType Directory -Force -Path $env:GOBIN
 
