@@ -92,9 +92,6 @@ C:\vcpkg\vcpkg.exe install curl:x64-windows
 Write-Host "=== Installing yaml-cpp ===" -ForegroundColor Cyan
 C:\vcpkg\vcpkg.exe install yaml-cpp:x64-windows
 
-Write-Host "=== Installing OpenLDAP ===" -ForegroundColor Cyan
-C:\vcpkg\vcpkg.exe install openldap:x64-windows
-
 Write-Host "=== Installing ACE Framework ===" -ForegroundColor Cyan
 # ACE needs to be built from source on Windows
 $aceUrl = "https://github.com/DOCGroup/ACE_TAO/releases/download/ACE%2BTAO-7_1_2/ACE-7.1.2.tar.gz"
@@ -218,14 +215,6 @@ git clone --depth=1 -b v2.x https://github.com/catchorg/Catch2.git
 Copy-Item "Catch2\single_include\catch2\catch.hpp" "C:\local\include\"
 
 Write-Host "=== Building LDAP-CPP ===" -ForegroundColor Cyan
-
-git clone --depth=1 https://github.com/AndreyBarmaley/ldap-cpp.git
-Set-Location ldap-cpp
-New-Item -ItemType Directory -Force -Path "build"
-Set-Location build
-cmake -DBUILD_SHARED_LIBS=OFF -DCMAKE_INSTALL_PREFIX=C:\local -DCMAKE_TOOLCHAIN_FILE=C:\vcpkg\scripts\buildsystems\vcpkg.cmake ..
-cmake --build . --config Release --target install --parallel
-Set-Location $ROOTDIR
 
 Write-Host "=== Building QR Code Generator ===" -ForegroundColor Cyan
 git clone --depth=1 https://github.com/nayuki/QR-Code-generator.git
