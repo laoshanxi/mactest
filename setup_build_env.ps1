@@ -31,7 +31,10 @@ Set-Location $ROOTDIR
 function Download-File {
     param($url, $output)
     Write-Host "Downloading $url..." -ForegroundColor Yellow
+    $oldProgressPreference = $ProgressPreference
+    $ProgressPreference = 'SilentlyContinue'
     Invoke-WebRequest -Uri $url -OutFile $output -UseBasicParsing
+    $ProgressPreference = $oldProgressPreference
 }
 
 # Function to extract archives
@@ -140,9 +143,7 @@ if ($perlPath) {
 # Build ACE
 $env:ACE_ROOT = "$PWD"
 $env:PATH = "$env:ACE_ROOT\bin;$env:PATH"
-#$env:OPENSSL_ROOT_DIR = "C:\vcpkg\installed\x64-windows"
-#$env:OPENSSL_INCLUDE_DIR = "$env:OPENSSL_ROOT_DIR\include"
-#$env:OPENSSL_LIB_DIR = "$env:OPENSSL_ROOT_DIR\lib"
+$env:SSL_ROOT = "C:\vcpkg\installed\x64-windows"
 
 # Create ACE config files
 @"
