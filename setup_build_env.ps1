@@ -31,10 +31,7 @@ Set-Location $ROOTDIR
 function Download-File {
     param($url, $output)
     Write-Host "Downloading $url..." -ForegroundColor Yellow
-    $oldProgressPreference = $ProgressPreference
-    $ProgressPreference = 'SilentlyContinue'
-    Invoke-WebRequest -Uri $url -OutFile $output -UseBasicParsing
-    $ProgressPreference = $oldProgressPreference
+    Invoke-WebRequest -Uri $url -OutFile $output -UseBasicParsing | Out-Null
 }
 
 # Function to extract archives
@@ -215,11 +212,6 @@ go install github.com/cloudflare/cfssl/cmd/cfssl@latest
 go install github.com/cloudflare/cfssl/cmd/cfssljson@latest
 go install github.com/goreleaser/nfpm/v2/cmd/nfpm@latest
 
-Write-Host "=== Installing Python and pip packages ===" -ForegroundColor Cyan
-choco install -y python3
-python -m pip install --upgrade pip
-python -m pip install msgpack requests requests_toolbelt aniso8601 twine wheel
-
 Write-Host "=== Installing Header-only Libraries ===" -ForegroundColor Cyan
 Set-Location $ROOTDIR
 # log4cpp
@@ -227,7 +219,7 @@ Download-File https://jaist.dl.sourceforge.net/project/log4cpp/log4cpp-1.1.x%20%
 tar -xvf log4cpp.tar.gz
 mkdir log4cpp\build
 cd log4cpp\build
-cmake .. -G "Visual Studio 17 2022" -A x64 -DCMAKE_INSTALL_PREFIX="C:/local"
+cmake .. -Wno-dev -G "Visual Studio 17 2022" -A x64 -DCMAKE_INSTALL_PREFIX="C:/local"
 cmake --build . --config Release
 cmake --install . --config Release
 Set-Location $ROOTDIR
