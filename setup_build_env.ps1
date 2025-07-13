@@ -12,6 +12,7 @@ if (-NOT ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdent
 
 # Set error handling
 $ErrorActionPreference = "Stop"
+Set-PSDebug -Trace 1
 
 # Architecture detection and validation
 $architecture = switch ($env:PROCESSOR_ARCHITECTURE) {
@@ -32,14 +33,14 @@ New-Item -ItemType Directory -Force -Path $ROOTDIR
 Set-Location $ROOTDIR
 
 # Function to download files
-function Download-File {
+function Save-File {
     param($url, $output)
     Write-Host "Downloading $url..." -ForegroundColor Yellow
     Invoke-WebRequest -Uri $url -OutFile $output -UseBasicParsing
 }
 
 # Function to extract archives
-function Extract-Archive {
+function Expand-File {
     param($archive, $destination)
     Write-Host "Extracting $archive..." -ForegroundColor Yellow
     Expand-Archive -Path $archive -DestinationPath $destination -Force
@@ -60,7 +61,7 @@ function Find-Perl {
     
     foreach ($pathPattern in $possiblePaths) {
         $perlExe = Get-ChildItem -Path $pathPattern -Filter "perl.exe" -Recurse -ErrorAction SilentlyContinue | 
-                  Select-Object -First 1
+        Select-Object -First 1
         if ($perlExe) {
             $script:PerlPath = $perlExe.Directory.FullName
             Write-Host "Found Perl in: $script:PerlPath" -ForegroundColor Green
@@ -124,7 +125,7 @@ C:\vcpkg\vcpkg.exe install yaml-cpp:x64-windows
 Write-Host "=== Installing ACE Framework ===" -ForegroundColor Cyan
 # ACE needs to be built from source on Windows
 $aceUrl = "https://github.com/DOCGroup/ACE_TAO/releases/download/ACE%2BTAO-7_1_2/ACE-7.1.2.tar.gz"
-Download-File $aceUrl ACE-7.1.2.tar.gz
+Save-File $aceUrl ACE-7.1.2.tar.gz
 tar zxvf ACE-7.1.2.tar.gz
 $acePath = Get-ChildItem -Directory -Name "*ACE_wrappers*" | Select-Object -First 1
 Set-Location $acePath
@@ -133,7 +134,8 @@ Set-Location $acePath
 $perlPath = Find-Perl
 if ($perlPath) {
     $env:PATH = "$perlPath;$env:PATH"
-} else {
+}
+else {
     Write-Host "No Perl installation found. Installing Perl..." -ForegroundColor Yellow
     choco install -y strawberryperl
     $perlPath = Find-Perl
@@ -190,8 +192,8 @@ Set-Location $ROOTDIR
 
 Write-Host "=== Installing nlohmann/json ===" -ForegroundColor Cyan
 $jsonUrl = "https://github.com/nlohmann/json/releases/download/v3.11.3/include.zip"
-Download-File $jsonUrl "json-include.zip"
-Extract-Archive "json-include.zip" "json-temp"
+Save-File $jsonUrl "json-include.zip"
+Expand-File "json-include.zip" "json-temp"
 New-Item -ItemType Directory -Force -Path "C:\local\include"
 Copy-Item -Recurse "json-temp\include\nlohmann" "C:\local\include\" -Force
 
@@ -200,8 +202,8 @@ if (!(Get-Command go -ErrorAction SilentlyContinue)) {
     $goVersion = "1.23.8"
     $goArch = if ($architecture -eq "arm64") { "arm64" } else { "amd64" }
     $goUrl = "https://go.dev/dl/go$goVersion.windows-$goArch.zip"
-    Download-File $goUrl "go.zip"
-    Extract-Archive "go.zip" "C:\"
+    Save-File $goUrl "go.zip"
+    Expand-File "go.zip" "C:\"
     $env:PATH = "C:\go\bin;$env:PATH"
     [Environment]::SetEnvironmentVariable("PATH", $env:PATH, [EnvironmentVariableTarget]::Machine)
 }
@@ -210,8 +212,8 @@ Write-Host "=== Installing Go Dependencies ===" -ForegroundColor Cyan
 $env:GOBIN = "C:\local\bin"
 New-Item -ItemType Directory -Force -Path $env:GOBIN
 
-go env -w GOPROXY=https://goproxy.io,direct
-go env -w GOBIN=C:\local\bin
+go env -w GOPROXY="https://goproxy.io,direct"
+go env -w GOBIN="C:\local\bin"
 go env -w GO111MODULE=on
 
 go install github.com/cloudflare/cfssl/cmd/cfssl@latest
@@ -221,10 +223,9 @@ go install github.com/goreleaser/nfpm/v2/cmd/nfpm@latest
 Write-Host "=== Installing Header-only Libraries ===" -ForegroundColor Cyan
 Set-Location $ROOTDIR
 # log4cpp
-Download-File https://jaist.dl.sourceforge.net/project/log4cpp/log4cpp-1.1.x%20%28new%29/log4cpp-1.1/log4cpp-1.1.4.tar.gz log4cpp.tar.gz
+Save-File https://jaist.dl.sourceforge.net/project/log4cpp/log4cpp-1.1.x%20%28new%29/log4cpp-1.1/log4cpp-1.1.4.tar.gz log4cpp.tar.gz
 tar -xvf log4cpp.tar.gz
-mkdir log4cpp\build
-cd log4cpp\build
+cd log4cpp; mkdir build; cd build
 # patch CMakeLists.txt to add cmake_minimum_required
 $cmakeFile = "..\CMakeLists.txt"
 if (Test-Path $cmakeFile) {
@@ -234,22 +235,20 @@ if (Test-Path $cmakeFile) {
         $newLines = @("cmake_minimum_required(VERSION 3.10)") + $lines
         Set-Content $cmakeFile $newLines
         Write-Host "Patched: Inserted cmake_minimum_required at the top of $cmakeFile"
-    } else {
+    }
+    else {
         Write-Host "Already contains cmake_minimum_required"
     }
-} else {
+}
+else {
     Write-Error "File not found: $cmakeFile"
 }
-cmake .. -Wno-dev -G "Visual Studio 17 2022" -A x64 -DCMAKE_INSTALL_PREFIX="C:/local"
-cmake --build . --config Release
-cmake --install . --config Release
+cmake .. -Wno-dev -G "Visual Studio 17 2022" -A x64 -DCMAKE_INSTALL_PREFIX="C:/local"; cmake --build . --config Release; cmake --install . --config Release
 Set-Location $ROOTDIR
 
-# Message Pack
+# Message Pack (use CMAKE_TOOLCHAIN_FILE to make sure can find boost)
 git clone -b cpp_master --depth 1 https://github.com/msgpack/msgpack-c.git
-cd msgpack-c
-cmake . -Wno-dev -DMSGPACK_USE_BOOST=OFF -G "Visual Studio 17 2022" -A x64 -DCMAKE_INSTALL_PREFIX="C:/local"
-cmake --install . --config Release
+cd msgpack-c; cmake . -G "Visual Studio 17 2022" -A x64 -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake -DCMAKE_INSTALL_PREFIX="C:/local"; cmake --install . --config Release
 Set-Location $ROOTDIR
 
 # hashidsxx
