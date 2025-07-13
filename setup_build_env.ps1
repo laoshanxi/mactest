@@ -228,6 +228,21 @@ Download-File https://jaist.dl.sourceforge.net/project/log4cpp/log4cpp-1.1.x%20%
 tar -xvf log4cpp.tar.gz
 mkdir log4cpp\build
 cd log4cpp\build
+# patch CMakeLists.txt to add cmake_minimum_required
+$cmakeFile = "..\CMakeLists.txt"
+if (Test-Path $cmakeFile) {
+    $lines = Get-Content $cmakeFile
+    if ($lines[0] -notmatch 'cmake_minimum_required') {
+        # Insert the required line at the top
+        $newLines = @("cmake_minimum_required(VERSION 3.10)") + $lines
+        Set-Content $cmakeFile $newLines
+        Write-Host "Patched: Inserted cmake_minimum_required at the top of $cmakeFile"
+    } else {
+        Write-Host "Already contains cmake_minimum_required"
+    }
+} else {
+    Write-Error "File not found: $cmakeFile"
+}
 cmake .. -Wno-dev -G "Visual Studio 17 2022" -A x64 -DCMAKE_INSTALL_PREFIX="C:/local"
 cmake --build . --config Release
 cmake --install . --config Release
