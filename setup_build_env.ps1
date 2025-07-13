@@ -140,6 +140,9 @@ if ($perlPath) {
 # Build ACE
 $env:ACE_ROOT = "$PWD"
 $env:PATH = "$env:ACE_ROOT\bin;$env:PATH"
+$env:OPENSSL_ROOT_DIR = "C:\vcpkg\installed\x64-windows"
+$env:OPENSSL_INCLUDE_DIR = "$env:OPENSSL_ROOT_DIR\include"
+$env:OPENSSL_LIB_DIR = "$env:OPENSSL_ROOT_DIR\lib"
 
 # Create ACE config files
 @"
