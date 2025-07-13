@@ -121,9 +121,6 @@ C:\vcpkg\vcpkg.exe install curl:x64-windows
 Write-Host "=== Installing yaml-cpp ===" -ForegroundColor Cyan
 C:\vcpkg\vcpkg.exe install yaml-cpp:x64-windows
 
-Write-Host "=== Installing msgpack-c ===" -ForegroundColor Cyan
-C:\vcpkg\vcpkg.exe install msgpack-c:x64-windows
-
 Write-Host "=== Installing ACE Framework ===" -ForegroundColor Cyan
 # ACE needs to be built from source on Windows
 $aceUrl = "https://github.com/DOCGroup/ACE_TAO/releases/download/ACE%2BTAO-7_1_2/ACE-7.1.2.tar.gz"
@@ -245,6 +242,13 @@ if (Test-Path $cmakeFile) {
 }
 cmake .. -Wno-dev -G "Visual Studio 17 2022" -A x64 -DCMAKE_INSTALL_PREFIX="C:/local"
 cmake --build . --config Release
+cmake --install . --config Release
+Set-Location $ROOTDIR
+
+# Message Pack
+git clone -b cpp_master --depth 1 https://github.com/msgpack/msgpack-c.git
+cd msgpack-c
+cmake . -Wno-dev -G "Visual Studio 17 2022" -A x64 -DCMAKE_INSTALL_PREFIX="C:/local"
 cmake --install . --config Release
 Set-Location $ROOTDIR
 
