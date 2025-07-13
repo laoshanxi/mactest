@@ -195,10 +195,13 @@ if (!(Get-Command go -ErrorAction SilentlyContinue)) {
 }
 
 Write-Host "=== Installing Go Dependencies ===" -ForegroundColor Cyan
+$env:GOBIN = "C:\local\bin"
 New-Item -ItemType Directory -Force -Path $env:GOBIN
+
 go env -w GOPROXY=https://goproxy.io,direct
 go env -w GOBIN=C:\local\bin
 go env -w GO111MODULE=on
+
 go install github.com/cloudflare/cfssl/cmd/cfssl@latest
 go install github.com/cloudflare/cfssl/cmd/cfssljson@latest
 go install github.com/goreleaser/nfpm/v2/cmd/nfpm@latest
