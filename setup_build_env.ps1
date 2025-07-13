@@ -140,9 +140,9 @@ if ($perlPath) {
 # Build ACE
 $env:ACE_ROOT = "$PWD"
 $env:PATH = "$env:ACE_ROOT\bin;$env:PATH"
-$env:OPENSSL_ROOT_DIR = "C:\vcpkg\installed\x64-windows"
-$env:OPENSSL_INCLUDE_DIR = "$env:OPENSSL_ROOT_DIR\include"
-$env:OPENSSL_LIB_DIR = "$env:OPENSSL_ROOT_DIR\lib"
+#$env:OPENSSL_ROOT_DIR = "C:\vcpkg\installed\x64-windows"
+#$env:OPENSSL_INCLUDE_DIR = "$env:OPENSSL_ROOT_DIR\include"
+#$env:OPENSSL_LIB_DIR = "$env:OPENSSL_ROOT_DIR\lib"
 
 # Create ACE config files
 @"
@@ -176,6 +176,11 @@ New-Item -ItemType Directory -Force -Path "C:\local\include\"
 Copy-Item -Recurse "$env:ACE_ROOT\ace" "C:\local\include\" -Force
 New-Item -ItemType Directory -Force -Path "C:\local\lib\"
 Copy-Item "$env:ACE_ROOT\lib\*" "C:\local\lib\" -Force
+# List installed ACE libraries
+Write-Host "Installed ACE libraries:" -ForegroundColor Green
+Get-ChildItem -Path "C:\local\lib\" | ForEach-Object {
+    Write-Host $_.Name -ForegroundColor White
+}
 
 Set-Location $ROOTDIR
 
