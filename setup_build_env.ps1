@@ -209,6 +209,16 @@ python -m pip install --upgrade pip
 python -m pip install msgpack requests requests_toolbelt aniso8601 twine wheel
 
 Write-Host "=== Installing Header-only Libraries ===" -ForegroundColor Cyan
+Set-Location $ROOTDIR
+# log4cpp
+Download-File https://jaist.dl.sourceforge.net/project/log4cpp/log4cpp-1.1.x%20%28new%29/log4cpp-1.1/log4cpp-1.1.4.tar.gz log4cpp.tar.gz
+tar -xvf log4cpp.tar.gz
+mkdir log4cpp\build
+cd log4cpp\build
+cmake .. -G "Visual Studio 17 2022" -A x64 -DCMAKE_INSTALL_PREFIX="C:/local"
+cmake --build . --config Release
+cmake --install . --config Release
+Set-Location $ROOTDIR
 
 # hashidsxx
 git clone --depth=1 https://github.com/schoentoon/hashidsxx.git
@@ -286,6 +296,8 @@ include("C:/vcpkg/scripts/buildsystems/vcpkg.cmake")
 list(APPEND CMAKE_PREFIX_PATH C:/local)
 list(APPEND CMAKE_INCLUDE_PATH C:/local/include)
 list(APPEND CMAKE_LIBRARY_PATH C:/local/lib)
+message(STATUS "Toolchain CMAKE_INCLUDE_PATH: ${CMAKE_INCLUDE_PATH}")
+message(STATUS "Toolchain CMAKE_LIBRARY_PATH: ${CMAKE_LIBRARY_PATH}")
 
 # MSVC specific settings
 set(CMAKE_CXX_STANDARD 17)
@@ -304,8 +316,8 @@ Write-Host "=== Build Environment Setup Complete ===" -ForegroundColor Green
 Write-Host ""
 Write-Host "To build your project, use:" -ForegroundColor Yellow
 Write-Host "mkdir build && cd build" -ForegroundColor White
-Write-Host "cmake .. -DCMAKE_TOOLCHAIN_FILE=C:\local\windows-toolchain.cmake -G `"Visual Studio 17 2022`" -A x64" -ForegroundColor White
-Write-Host "cmake --build . --config Release" -ForegroundColor White
+Write-Host "cmake .. -DCMAKE_TOOLCHAIN_FILE=C:\local\windows-toolchain.cmake -G Ninja" -ForegroundColor White
+Write-Host "cmake --build ." -ForegroundColor White
 Write-Host ""
 Write-Host "Important paths:" -ForegroundColor Yellow
 Write-Host "- Libraries: C:\local\lib" -ForegroundColor White
