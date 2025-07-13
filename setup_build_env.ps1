@@ -248,7 +248,7 @@ Set-Location $ROOTDIR
 # Message Pack
 git clone -b cpp_master --depth 1 https://github.com/msgpack/msgpack-c.git
 cd msgpack-c
-cmake . -Wno-dev -G "Visual Studio 17 2022" -A x64 -DCMAKE_INSTALL_PREFIX="C:/local"
+cmake . -Wno-dev -DMSGPACK_USE_BOOST=OFF -G "Visual Studio 17 2022" -A x64 -DCMAKE_INSTALL_PREFIX="C:/local"
 cmake --install . --config Release
 Set-Location $ROOTDIR
 
