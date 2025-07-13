@@ -299,30 +299,40 @@ foreach ($path in $paths) {
 Write-Host "=== Creating CMake Toolchain File ===" -ForegroundColor Cyan
 @"
 # Windows MSVC Toolchain for App-Mesh
+if(DEFINED CMAKE_TOOLCHAIN_FILE_INCLUDED)
+    return()
+endif()
+set(CMAKE_TOOLCHAIN_FILE_INCLUDED TRUE)
+
 set(CMAKE_SYSTEM_NAME Windows)
-set(CMAKE_SYSTEM_PROCESSOR x64)
 
 # Explicitly include vcpkg toolchain
 include("C:/vcpkg/scripts/buildsystems/vcpkg.cmake")
 
 # Set additional include and library paths
-list(APPEND CMAKE_PREFIX_PATH C:/local)
-list(APPEND CMAKE_INCLUDE_PATH C:/local/include)
-list(APPEND CMAKE_LIBRARY_PATH C:/local/lib)
-message(STATUS "Toolchain CMAKE_INCLUDE_PATH: ${CMAKE_INCLUDE_PATH}")
-message(STATUS "Toolchain CMAKE_LIBRARY_PATH: ${CMAKE_LIBRARY_PATH}")
+include_directories("C:/local/include")
+link_directories("C:/local/lib")
+list(PREPEND CMAKE_PREFIX_PATH "C:/local")
 
-# MSVC specific settings
+# C++ Standard
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Optimization flags
-set(CMAKE_CXX_FLAGS_RELEASE "/O2 /Ob2 /DNDEBUG /MD")
-set(CMAKE_C_FLAGS_RELEASE "/O2 /Ob2 /DNDEBUG /MD")
+set(CMAKE_CXX_FLAGS_RELEASE_INIT "/O2 /Ob2 /DNDEBUG /MD")
+set(CMAKE_C_FLAGS_RELEASE_INIT "/O2 /Ob2 /DNDEBUG /MD")
 
 # Windows specific definitions
-add_definitions(-DWIN32 -D_WIN32 -D_WINDOWS)
-add_definitions(-DNOMINMAX -DWIN32_LEAN_AND_MEAN)
+add_compile_definitions(
+    WIN32
+    _WIN32
+    _WINDOWS
+    NOMINMAX
+    WIN32_LEAN_AND_MEAN
+)
+
+# Debugging output
+message(STATUS "Toolchain CMAKE_PREFIX_PATH: ${CMAKE_PREFIX_PATH}")
 "@ | Out-File -FilePath "C:\local\windows-toolchain.cmake" -Encoding utf8
 
 Write-Host "=== Cleanup ===" -ForegroundColor Cyan
