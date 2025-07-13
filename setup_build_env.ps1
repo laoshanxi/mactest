@@ -13,10 +13,14 @@ if (-NOT ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdent
 # Set error handling
 $ErrorActionPreference = "Stop"
 
-# Architecture detection
-$architecture = "amd64"
-if ($env:PROCESSOR_ARCHITECTURE -eq "ARM64") {
-    $architecture = "arm64"
+# Architecture detection and validation
+$architecture = switch ($env:PROCESSOR_ARCHITECTURE) {
+    "ARM64" { "arm64" }
+    "AMD64" { "amd64" }
+    default { 
+        Write-Warning "Unknown architecture: $env:PROCESSOR_ARCHITECTURE. Defaulting to amd64"
+        "amd64" 
+    }
 }
 
 Write-Host "Detected architecture: $architecture" -ForegroundColor Green
@@ -31,7 +35,7 @@ Set-Location $ROOTDIR
 function Download-File {
     param($url, $output)
     Write-Host "Downloading $url..." -ForegroundColor Yellow
-    Invoke-WebRequest -Uri $url -OutFile $output -UseBasicParsing | Out-Null
+    Invoke-WebRequest -Uri $url -OutFile $output -UseBasicParsing
 }
 
 # Function to extract archives
@@ -41,21 +45,26 @@ function Extract-Archive {
     Expand-Archive -Path $archive -DestinationPath $destination -Force
 }
 
-# Function to find perl path
+# Optimized Perl finder with caching
+$script:PerlPath = $null
 function Find-Perl {
-    # Find by priority
+    if ($script:PerlPath) { return $script:PerlPath }
+    
     $possiblePaths = @(
         "C:\vcpkg\downloads\tools\perl\*\perl\bin", # from vcpkg
         "C:\Perl*\bin",                             # stardand installation
-        "C:\Strawberry\perl\bin"                    # Strawberry Perl
+        "C:\Strawberry\perl\bin",                   # Strawberry Perl
+        "$env:ProgramFiles\Perl\bin",               # ActivePerl
+        "${env:ProgramFiles(x86)}\Perl\bin"         # ActivePerl (x86)
     )
     
-    foreach ($path in $possiblePaths) {
-        $perlPath = Get-ChildItem -Path $path -Filter "perl.exe" -Recurse -ErrorAction SilentlyContinue | 
-                   Select-Object -First 1 -ExpandProperty Directory
-        if ($perlPath) {
-            Write-Host "Found Perl in: $perlPath" -ForegroundColor Green
-            return $perlPath
+    foreach ($pathPattern in $possiblePaths) {
+        $perlExe = Get-ChildItem -Path $pathPattern -Filter "perl.exe" -Recurse -ErrorAction SilentlyContinue | 
+                  Select-Object -First 1
+        if ($perlExe) {
+            $script:PerlPath = $perlExe.Directory.FullName
+            Write-Host "Found Perl in: $script:PerlPath" -ForegroundColor Green
+            return $script:PerlPath
         }
     }
     return $null
@@ -307,15 +316,20 @@ message(STATUS "Toolchain CMAKE_LIBRARY_PATH: ${CMAKE_LIBRARY_PATH}")
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# Optimization flags
+set(CMAKE_CXX_FLAGS_RELEASE "/O2 /Ob2 /DNDEBUG /MD")
+set(CMAKE_C_FLAGS_RELEASE "/O2 /Ob2 /DNDEBUG /MD")
+
 # Windows specific definitions
 add_definitions(-DWIN32 -D_WIN32 -D_WINDOWS)
 add_definitions(-DNOMINMAX -DWIN32_LEAN_AND_MEAN)
-"@ | Out-File -FilePath "C:\local\windows-toolchain.cmake" -Encoding ascii
+"@ | Out-File -FilePath "C:\local\windows-toolchain.cmake" -Encoding utf8
 
 Write-Host "=== Cleanup ===" -ForegroundColor Cyan
 Set-Location $SRC_DIR
 Remove-Item -Recurse -Force $ROOTDIR -ErrorAction SilentlyContinue
 
+# Final summary
 Write-Host "=== Build Environment Setup Complete ===" -ForegroundColor Green
 Write-Host ""
 Write-Host "To build your project, use:" -ForegroundColor Yellow
@@ -329,4 +343,4 @@ Write-Host "- Headers: C:\local\include" -ForegroundColor White
 Write-Host "- Binaries: C:\local\bin" -ForegroundColor White
 Write-Host "- vcpkg: C:\vcpkg" -ForegroundColor White
 Write-Host ""
-Write-Host "You may need to restart your terminal for environment variables to take effect." -ForegroundColor Cyan
+Write-Host "Please restart your terminal or run 'refreshenv' to use the new environment." -ForegroundColor Cyan
