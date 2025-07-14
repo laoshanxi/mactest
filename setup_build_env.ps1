@@ -12,7 +12,7 @@ if (-NOT ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdent
 
 # Set error handling
 $ErrorActionPreference = "Stop"
-Set-PSDebug -Trace 1
+# Set-PSDebug -Trace 1
 
 # Architecture detection and validation
 $architecture = switch ($env:PROCESSOR_ARCHITECTURE) {
@@ -111,7 +111,16 @@ Write-Host "=== Installing OpenSSL ===" -ForegroundColor Cyan
 C:\vcpkg\vcpkg.exe install openssl:x64-windows
 
 Write-Host "=== Installing Boost Libraries ===" -ForegroundColor Cyan
-C:\vcpkg\vcpkg.exe install boost[atomic,algorithm,iostreams,system,filesystem,date-time,thread,regex,program-options,asio]:x64-windows
+C:\vcpkg\vcpkg.exe install boost-atomic:x64-windows
+C:\vcpkg\vcpkg.exe install boost-algorithm:x64-windows
+C:\vcpkg\vcpkg.exe install boost-iostreams:x64-windows
+C:\vcpkg\vcpkg.exe install boost-system:x64-windows
+C:\vcpkg\vcpkg.exe install boost-filesystem:x64-windows
+C:\vcpkg\vcpkg.exe install boost-date-time:x64-windows
+C:\vcpkg\vcpkg.exe install boost-thread:x64-windows
+C:\vcpkg\vcpkg.exe install boost-regex:x64-windows
+C:\vcpkg\vcpkg.exe install boost-program-options:x64-windows
+C:\vcpkg\vcpkg.exe install boost-asio:x64-windows
 
 Write-Host "=== Installing Crypto++ ===" -ForegroundColor Cyan
 C:\vcpkg\vcpkg.exe install cryptopp:x64-windows
