@@ -111,7 +111,7 @@ Write-Host "=== Installing OpenSSL ===" -ForegroundColor Cyan
 C:\vcpkg\vcpkg.exe install openssl:x64-windows
 
 Write-Host "=== Installing Boost Libraries ===" -ForegroundColor Cyan
-C:\vcpkg\vcpkg.exe install boost:x64-windows
+C:\vcpkg\vcpkg.exe install boost[atomic,algorithm,iostreams,system,filesystem,date-time,thread,regex,program-options,asio]:x64-windows
 
 Write-Host "=== Installing Crypto++ ===" -ForegroundColor Cyan
 C:\vcpkg\vcpkg.exe install cryptopp:x64-windows
