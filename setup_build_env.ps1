@@ -30,7 +30,7 @@ Write-Host "Detected architecture: $architecture" -ForegroundColor Green
 $ROOTDIR = "$env:TEMP\appmesh-build-setup"
 $SRC_DIR = (Get-Location).Path
 New-Item -ItemType Directory -Force -Path $ROOTDIR
-Set-Location $ROOTDIR
+cd $ROOTDIR
 
 # Function to download files
 function Save-File {
@@ -128,7 +128,7 @@ $aceUrl = "https://github.com/DOCGroup/ACE_TAO/releases/download/ACE%2BTAO-7_1_2
 Save-File $aceUrl ACE-7.1.2.tar.gz
 tar zxvf ACE-7.1.2.tar.gz
 $acePath = Get-ChildItem -Directory -Name "*ACE_wrappers*" | Select-Object -First 1
-Set-Location $acePath
+cd $acePath
 
 # Add perl dir to PATH
 $perlPath = Find-Perl
@@ -172,7 +172,7 @@ Get-ChildItem -Path "$env:ACE_ROOT" -Recurse -Filter *.vcxproj | ForEach-Object 
 }
 
 # Build ACE using MSVC
-Set-Location "$env:ACE_ROOT"
+cd "$env:ACE_ROOT"
 & "C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\Common7\Tools\VsDevCmd.bat"
 & "C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin\MSBuild.exe" ACE.sln /t:ACE /p:Configuration=Release /p:Platform=x64 /maxcpucount
 & "C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin\MSBuild.exe" ACE.sln /t:SSL /p:Configuration=Release /p:Platform=x64 /maxcpucount
@@ -188,7 +188,7 @@ Get-ChildItem -Path "C:\local\lib\" | ForEach-Object {
     Write-Host $_.Name -ForegroundColor White
 }
 
-Set-Location $ROOTDIR
+cd $ROOTDIR
 
 Write-Host "=== Installing nlohmann/json ===" -ForegroundColor Cyan
 $jsonUrl = "https://github.com/nlohmann/json/releases/download/v3.11.3/include.zip"
@@ -221,7 +221,7 @@ go install github.com/cloudflare/cfssl/cmd/cfssljson@latest
 go install github.com/goreleaser/nfpm/v2/cmd/nfpm@latest
 
 Write-Host "=== Installing Header-only Libraries ===" -ForegroundColor Cyan
-Set-Location $ROOTDIR
+cd $ROOTDIR
 # log4cpp
 Save-File https://jaist.dl.sourceforge.net/project/log4cpp/log4cpp-1.1.x%20%28new%29/log4cpp-1.1/log4cpp-1.1.4.tar.gz log4cpp.tar.gz
 tar -xvf log4cpp.tar.gz
@@ -244,12 +244,12 @@ else {
     Write-Error "File not found: $cmakeFile"
 }
 cmake .. -Wno-dev -G "Visual Studio 17 2022" -A x64 -DCMAKE_INSTALL_PREFIX="C:/local"; cmake --build . --config Release; cmake --install . --config Release
-Set-Location $ROOTDIR
+cd $ROOTDIR
 
 # Message Pack (use CMAKE_TOOLCHAIN_FILE to make sure can find boost)
 git clone -b cpp_master --depth 1 https://github.com/msgpack/msgpack-c.git
 cd msgpack-c; cmake . -G "Visual Studio 17 2022" -A x64 -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake -DCMAKE_INSTALL_PREFIX="C:/local"; cmake --install . --config Release
-Set-Location $ROOTDIR
+cd $ROOTDIR
 
 # hashidsxx
 git clone --depth=1 https://github.com/schoentoon/hashidsxx.git
@@ -288,13 +288,13 @@ Write-Host "=== Building LDAP-CPP ===" -ForegroundColor Cyan
 
 Write-Host "=== Building QR Code Generator ===" -ForegroundColor Cyan
 git clone --depth=1 https://github.com/nayuki/QR-Code-generator.git
-Set-Location "QR-Code-generator\cpp"
+cd "QR-Code-generator\cpp"
 # Build using MSVC
 cmd /c "`"C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\Common7\Tools\VsDevCmd.bat`" && cl /EHsc /c qrcodegen.cpp && lib qrcodegen.obj /OUT:qrcodegencpp.lib"
 Copy-Item "qrcodegen.hpp" "C:\local\include\" -Force
 Copy-Item "qrcodegen.cpp" "C:\local\include\" -Force
 Copy-Item "qrcodegencpp.lib" "C:\local\lib\" -Force
-Set-Location $ROOTDIR
+cd $ROOTDIR
 
 Write-Host "=== Setting Environment Variables ===" -ForegroundColor Cyan
 # Set permanent environment variables
@@ -354,7 +354,7 @@ message(STATUS "Toolchain CMAKE_PREFIX_PATH: ${CMAKE_PREFIX_PATH}")
 "@ | Out-File -FilePath "C:\local\windows-toolchain.cmake" -Encoding utf8
 
 Write-Host "=== Cleanup ===" -ForegroundColor Cyan
-Set-Location $SRC_DIR
+cd $SRC_DIR
 Remove-Item -Recurse -Force $ROOTDIR -ErrorAction SilentlyContinue
 
 # Final summary
