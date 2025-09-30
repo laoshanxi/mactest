@@ -10,7 +10,7 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v5
-      - run: choco install 7zip -y
+      - run: choco install 7zip curl -y
 
       - name: Set PowerShell Execution Policy
         shell: pwsh
@@ -26,5 +26,5 @@ jobs:
         shell: pwsh
         run: |
           pwsh -File ./setup_build_env.ps1
-      - run: ping github.com
+      - run: curl github.com
       - run: python sample.py
