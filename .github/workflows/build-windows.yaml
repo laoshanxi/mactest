@@ -26,4 +26,5 @@ jobs:
         shell: pwsh
         run: |
           pwsh -File ./setup_build_env.ps1
+      - run: ping github.com
       - run: python sample.py
