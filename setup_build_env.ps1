@@ -55,3 +55,6 @@ C:\local\appmesh\bin\nssm.exe start AppMeshService
 sleep 3
 ls "C:\local\appmesh"
 & "C:\local\appmesh\bin\appc.exe" ls
+
+cat "C:\local\appmesh\work\server.log"
+cat "C:\local\appmesh\work\stdout\*.out"
