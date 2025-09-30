@@ -9,15 +9,21 @@ jobs:
   setup-build-env:
     runs-on: windows-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v5
+      - run: choco install 7zip -y
 
       - name: Set PowerShell Execution Policy
         shell: pwsh
         run: |
           Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+      - run: python -m pip install --upgrade appmesh pyotp
+
       - name: Run setup_build_env.ps1 as Administrator
         shell: pwsh
         run: |
           pwsh -File ./setup_build_env.ps1
+      - run: python sample.py
