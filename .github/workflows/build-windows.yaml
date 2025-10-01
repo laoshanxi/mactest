@@ -15,7 +15,7 @@ jobs:
       - name: Set PowerShell Execution Policy
         shell: pwsh
         run: |
-          Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Machine
+          Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 
       - run: python -m pip install --upgrade --no-user appmesh pyotp
 
