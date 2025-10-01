@@ -17,10 +17,7 @@ jobs:
         run: |
           Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 
-      - uses: actions/setup-python@v6
-        with:
-          python-version: '3.13'
-      - run: python -m pip install --upgrade appmesh pyotp
+      - run: python -m pip install --upgrade --no-user appmesh pyotp
 
       - name: Run setup_build_env.ps1 as Administrator
         shell: pwsh
