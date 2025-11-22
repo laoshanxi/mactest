@@ -44,11 +44,11 @@ function Expand-File {
 
 Write-Host "=== Installing App Mesh ===" -ForegroundColor Cyan
 # ACE needs to be built from source on Windows
-$aceUrl = "https://github.com/laoshanxi/app-mesh/releases/download/2.1.2/appmesh_2.1.2_windows_x64.exe"
-Save-File $aceUrl appmesh_2.1.2_windows_x64.exe
-7z x .\appmesh_2.1.2_windows_x64.exe -oC:\local\appmesh
+$aceUrl = "https://github.com/laoshanxi/app-mesh/releases/download/2.2.1/appmesh_2.2.1_windows_x64.exe"
+Save-File $aceUrl appmesh_2.2.1_windows_x64.exe
+7z x .\appmesh_2.2.1_windows_x64.exe -oC:\local\appmesh
 
-ls "C:\local\appmesh"
+ls "C:\local\appmesh" -Recurse
 C:\local\appmesh\bin\nssm.exe install AppMeshService "C:\local\appmesh\bin\appsvc.exe"
 C:\local\appmesh\bin\nssm.exe set AppMeshService Start SERVICE_AUTO_START
 C:\local\appmesh\bin\nssm.exe start AppMeshService
